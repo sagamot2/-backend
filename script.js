@@ -26,6 +26,7 @@ const salesChartCtx = document.getElementById('salesChart').getContext('2d');
 
 let chartInstance = null;
 const notificationSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
 async function sha256(text) {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
@@ -34,8 +35,38 @@ async function sha256(text) {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   return hashHex;
 }
+
 const validUsername = "pinny";
 const validPasswordHash = "24b899e8e3d9c1d09be71c3f79e5e62584ec67af6d7a1ab01e46be9e1bf47749";
+
+function showError(msg) {
+  const errorElem = document.getElementById("loginError");
+  errorElem.textContent = msg;
+  errorElem.classList.remove("hidden");
+}
+
+function showLoginPage() {
+  loginPage.classList.remove("hidden");
+  adminPage.classList.add("hidden");
+  document.getElementById('loginError').classList.add("hidden");
+}
+
+function showAdminPage() {
+  loginPage.classList.add("hidden");
+  adminPage.classList.remove("hidden");
+  document.getElementById('loginError').classList.add("hidden");
+}
+
+function checkLogin() {
+  const loggedIn = sessionStorage.getItem("loggedIn");
+  if (loggedIn === "true") {
+    showAdminPage();
+    initAdmin();
+  } else {
+    showLoginPage();
+  }
+}
+
 loginBtn.addEventListener("click", async () => {
   const user = usernameInput.value.trim();
   const pass = passwordInput.value.trim();
@@ -50,37 +81,10 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 
-function showError(msg) {
-  const errorElem = document.getElementById("loginError");
-  errorElem.textContent = msg;
-  errorElem.classList.remove("hidden");
-}
-
-function checkLogin() {
-  const loggedIn = sessionStorage.getItem("loggedIn");
-  if (loggedIn === "true") {
-    showAdminPage();
-    initAdmin();
-  } else {
-    showLoginPage();
-  }
-}
-
 logoutBtn.onclick = () => {
   sessionStorage.removeItem("loggedIn");
   showLoginPage();
 };
-
-function showLoginPage() {
-  loginPage.classList.remove("hidden");
-  adminPage.classList.add("hidden");
-}
-
-function showAdminPage() {
-  loginPage.classList.add("hidden");
-  adminPage.classList.remove("hidden");
-  document.getElementById('loginError').classList.add("hidden");
-}
 
 function initAdmin() {
   const today = new Date().toISOString().slice(0, 10);
@@ -199,12 +203,12 @@ function updateChart(orders) {
   }
 }
 
-filterDate.addEventListener("change", e => {
-  loadOrdersRealtime(e.target.value);
-});
-
 function playNotificationSound() {
   notificationSound.play();
 }
+
+filterDate.addEventListener("change", e => {
+  loadOrdersRealtime(e.target.value);
+});
 
 checkLogin();
