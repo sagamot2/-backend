@@ -1,4 +1,3 @@
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBS__oDn1BoIBG8TiYQks6mFwQd9sBFn_Q",
   authDomain: "somtam-da7ab.firebaseapp.com",
@@ -14,8 +13,6 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.database();
-
-// องค์ประกอบหน้าเว็บ
 const loginPage = document.getElementById('loginPage');
 const adminPage = document.getElementById('adminPage');
 const usernameInput = document.getElementById('username');
@@ -29,16 +26,22 @@ const salesChartCtx = document.getElementById('salesChart').getContext('2d');
 
 let chartInstance = null;
 const notificationSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-
-// ข้อมูลล็อกอิน
+async function sha256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
 const validUsername = "pinny";
-const validPassword = "020116";
-
-// ล็อกอิน
-loginBtn.addEventListener("click", () => {
+const validPasswordHash = "24b899e8e3d9c1d09be71c3f79e5e62584ec67af6d7a1ab01e46be9e1bf47749";
+loginBtn.addEventListener("click", async () => {
   const user = usernameInput.value.trim();
   const pass = passwordInput.value.trim();
-  if (user === validUsername && pass === validPassword) {
+  const passHash = await sha256(pass);
+
+  if (user === validUsername && passHash === validPasswordHash) {
     sessionStorage.setItem("loggedIn", "true");
     showAdminPage();
     initAdmin();
@@ -67,6 +70,7 @@ logoutBtn.onclick = () => {
   sessionStorage.removeItem("loggedIn");
   showLoginPage();
 };
+
 function showLoginPage() {
   loginPage.classList.remove("hidden");
   adminPage.classList.add("hidden");
@@ -75,6 +79,7 @@ function showLoginPage() {
 function showAdminPage() {
   loginPage.classList.add("hidden");
   adminPage.classList.remove("hidden");
+  document.getElementById('loginError').classList.add("hidden");
 }
 
 function initAdmin() {
@@ -104,30 +109,30 @@ function loadOrdersRealtime(date) {
     if (orders.length === 0) {
       orderList.textContent = "ยังไม่มีคำสั่งซื้อ";
       updateChart([]);
+      document.getElementById('orderCount').textContent = 0;
       return;
     }
 
-for (const order of orders) {
-  const div = document.createElement("div");
-  div.classList.add("order-item");
-  div.innerHTML = `
-    <p><strong>เวลา:</strong> ${order.timestamp}</p>
-    <p><strong>ชำระเงิน:</strong> ${order.paymentMethod}</p>
-    <ul>
-      ${order.items.map(i => `<li>${i.name} x${i.qty} = ${i.price * i.qty} บาท</li>`).join('')}
-    </ul>
-    <p><strong>รวม:</strong> ${order.total} บาท</p>
-    ${order.note ? `<p><strong>หมายเหตุ:</strong> ${order.note}</p>` : ""}
-    <button onclick="deleteOrder('${order.key}')">ลบ</button>
-  `;
-  orderList.appendChild(div);
-  sum += order.total;
-}
+    for (const order of orders) {
+      const div = document.createElement("div");
+      div.classList.add("order-item");
+      div.innerHTML = `
+        <p><strong>เวลา:</strong> ${order.timestamp}</p>
+        <p><strong>ชำระเงิน:</strong> ${order.paymentMethod}</p>
+        <ul>
+          ${order.items.map(i => `<li>${i.name} x${i.qty} = ${i.price * i.qty} บาท</li>`).join('')}
+        </ul>
+        <p><strong>รวม:</strong> ${order.total} บาท</p>
+        ${order.note ? `<p><strong>หมายเหตุ:</strong> ${order.note}</p>` : ""}
+        <button onclick="deleteOrder('${order.key}')">ลบ</button>
+      `;
+      orderList.appendChild(div);
+      sum += order.total;
+    }
 
     totalRevenue.textContent = sum.toFixed(2);
     updateChart(orders);
     document.getElementById('orderCount').textContent = orders.length;
-
   });
 }
 
@@ -148,6 +153,7 @@ function listenNewOrdersRealtime(date) {
     }
   });
 }
+
 function deleteOrder(key) {
   if (!confirm("ลบคำสั่งซื้อนี้ใช่ไหม?")) return;
   db.ref("orders/" + key).remove()
@@ -196,5 +202,9 @@ function updateChart(orders) {
 filterDate.addEventListener("change", e => {
   loadOrdersRealtime(e.target.value);
 });
+
+function playNotificationSound() {
+  notificationSound.play();
+}
 
 checkLogin();
