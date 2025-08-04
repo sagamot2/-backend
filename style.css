@@ -7,10 +7,7 @@ body {
   padding: 20px;
   user-select: none;
 }
-body {
-    -webkit-user-select: none; 
-    user-select: none;
-}
+
 .hidden {
   display: none;
 }
@@ -21,6 +18,7 @@ h1, h2 {
   margin-bottom: 30px;
   color: #81c784;
 }
+
 .login-container {
   background: #1e1e1e;
   padding: 40px 30px;
@@ -34,6 +32,7 @@ h1, h2 {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 .input-group {
   margin-bottom: 25px;
 }
@@ -46,7 +45,8 @@ label {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="date"] {
   width: 100%;
   padding: 14px 18px;
   border-radius: 10px;
@@ -57,27 +57,35 @@ input[type="password"] {
   box-shadow: inset 0 0 8px rgba(0,0,0,0.7);
   transition: box-shadow 0.3s ease;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="date"]:focus {
   outline: none;
   box-shadow: 0 0 12px #81c784;
+}
+
+button#loginBtn,
+#logoutBtn,
+#resetQueueBtn,
+.order-item button {
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
 }
 
 button#loginBtn {
   width: 100%;
   background: linear-gradient(135deg, #66bb6a, #388e3c);
   color: #fff;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
   padding: 16px 0;
-  cursor: pointer;
   font-size: 1.2rem;
   box-shadow: 0 6px 16px rgba(102, 187, 106, 0.7);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-  user-select: none;
 }
 
 button#loginBtn:hover {
@@ -108,6 +116,7 @@ button#loginBtn:hover {
     padding: 14px 0;
   }
 }
+
 #logoutBtn {
   background: #ef5350;
   box-shadow: 0 4px 12px rgba(239, 83, 80, 0.6);
@@ -115,17 +124,27 @@ button#loginBtn:hover {
   margin-top: 10px;
   margin-bottom: 20px;
   width: auto;
-  padding: 10px 26px;
-  font-weight: 700;
+  padding: 5px 17px;
   font-size: 1rem;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 #logoutBtn:hover {
   background: #e53935;
   box-shadow: 0 6px 18px rgba(229, 57, 53, 0.8);
+}
+
+#resetQueueBtn {
+  background: #ff7043;
+  box-shadow: 0 4px 12px rgba(255, 112, 67, 0.6);
+  margin-left: 10px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  color: white;
+}
+
+#resetQueueBtn:hover {
+  background: #f4511e;
+  box-shadow: 0 6px 18px rgba(244, 81, 30, 0.8);
 }
 
 #orderList {
@@ -151,11 +170,9 @@ button#loginBtn:hover {
   margin: 8px 0;
 }
 
-#totalRevenue {
+#totalRevenue, #orderCount {
   font-weight: 700;
-  font-size: 1.6rem;
-  text-align: center;
-  margin-top: 30px;
+  font-size: 1.2rem;
   color: #a5d6a7;
 }
 
@@ -172,4 +189,73 @@ label[for="filterDate"] {
   margin-left: auto;
   margin-right: auto;
   cursor: pointer;
+}
+
+.order-item button {
+  margin-top: 10px;
+  margin-right: 8px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border-radius: 10px;
+  transition: background 0.3s, box-shadow 0.3s;
+  border: none;
+}
+
+.order-item button.status-pending {
+  background: #ff9800;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.6);
+}
+
+.order-item button.status-pending:hover {
+  background: #fb8c00;
+  box-shadow: 0 6px 16px rgba(255, 152, 0, 0.8);
+}
+
+.order-item button.status-done {
+  background: #4caf50;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.6);
+}
+
+.order-item button.status-done:hover {
+  background: #388e3c;
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.8);
+}
+
+.order-item .status-text {
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.status-text.pending {
+  background-color: #ffb74d;
+  color: #222;
+}
+
+.status-text.done {
+  background-color: #81c784;
+  color: #222;
+}
+
+.order-item button.delete-order {
+  background: #e53935;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(229, 57, 53, 0.6);
+}
+
+.order-item button.delete-order:hover {
+  background: #c62828;
+  box-shadow: 0 6px 16px rgba(229, 57, 53, 0.8);
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
