@@ -27,27 +27,31 @@ const salesChartCtx = document.getElementById('salesChart').getContext('2d');
 let chartInstance = null;
 const notificationSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
-// ข้อมูลล็อกอิน
 const validUsername = "pinny";
 const validPassword = "020116";
-
-// ล็อกอิน
-loginBtn.addEventListener("click", () => {
-  const user = usernameInput.value.trim();
-  const pass = passwordInput.value.trim();
-  if (user === validUsername && pass === validPassword) {
-    sessionStorage.setItem("loggedIn", "true");
-    showAdminPage();
-    initAdmin();
-  } else {
-    showError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-  }
-});
 
 function showError(msg) {
   const errorElem = document.getElementById("loginError");
   errorElem.textContent = msg;
   errorElem.classList.remove("hidden");
+}
+
+function hideError() {
+  const errorElem = document.getElementById("loginError");
+  errorElem.textContent = "";
+  errorElem.classList.add("hidden");
+}
+
+function showLoginPage() {
+  loginPage.classList.remove("hidden");
+  adminPage.classList.add("hidden");
+  hideError();
+}
+
+function showAdminPage() {
+  loginPage.classList.add("hidden");
+  adminPage.classList.remove("hidden");
+  hideError();
 }
 
 function checkLogin() {
@@ -60,19 +64,22 @@ function checkLogin() {
   }
 }
 
+loginBtn.addEventListener("click", () => {
+  const user = usernameInput.value.trim();
+  const pass = passwordInput.value.trim();
+  if (user === validUsername && pass === validPassword) {
+    sessionStorage.setItem("loggedIn", "true");
+    showAdminPage();
+    initAdmin();
+  } else {
+    showError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+  }
+});
+
 logoutBtn.onclick = () => {
   sessionStorage.removeItem("loggedIn");
   showLoginPage();
 };
-function showLoginPage() {
-  loginPage.classList.remove("hidden");
-  adminPage.classList.add("hidden");
-}
-
-function showAdminPage() {
-  loginPage.classList.add("hidden");
-  adminPage.classList.remove("hidden");
-}
 
 function initAdmin() {
   const today = new Date().toISOString().slice(0, 10);
@@ -101,30 +108,30 @@ function loadOrdersRealtime(date) {
     if (orders.length === 0) {
       orderList.textContent = "ยังไม่มีคำสั่งซื้อ";
       updateChart([]);
+      document.getElementById('orderCount').textContent = 0;
       return;
     }
 
-for (const order of orders) {
-  const div = document.createElement("div");
-  div.classList.add("order-item");
-  div.innerHTML = `
-    <p><strong>เวลา:</strong> ${order.timestamp}</p>
-    <p><strong>ชำระเงิน:</strong> ${order.paymentMethod}</p>
-    <ul>
-      ${order.items.map(i => `<li>${i.name} x${i.qty} = ${i.price * i.qty} บาท</li>`).join('')}
-    </ul>
-    <p><strong>รวม:</strong> ${order.total} บาท</p>
-    ${order.note ? `<p><strong>หมายเหตุ:</strong> ${order.note}</p>` : ""}
-    <button onclick="deleteOrder('${order.key}')">ลบ</button>
-  `;
-  orderList.appendChild(div);
-  sum += order.total;
-}
+    for (const order of orders) {
+      const div = document.createElement("div");
+      div.classList.add("order-item");
+      div.innerHTML = `
+        <p><strong>เวลา:</strong> ${order.timestamp}</p>
+        <p><strong>ชำระเงิน:</strong> ${order.paymentMethod}</p>
+        <ul>
+          ${order.items.map(i => `<li>${i.name} x${i.qty} = ${i.price * i.qty} บาท</li>`).join('')}
+        </ul>
+        <p><strong>รวม:</strong> ${order.total} บาท</p>
+        ${order.note ? `<p><strong>หมายเหตุ:</strong> ${order.note}</p>` : ""}
+        <button onclick="deleteOrder('${order.key}')">ลบ</button>
+      `;
+      orderList.appendChild(div);
+      sum += order.total;
+    }
 
     totalRevenue.textContent = sum.toFixed(2);
     updateChart(orders);
     document.getElementById('orderCount').textContent = orders.length;
-
   });
 }
 
@@ -145,6 +152,7 @@ function listenNewOrdersRealtime(date) {
     }
   });
 }
+
 function deleteOrder(key) {
   if (!confirm("ลบคำสั่งซื้อนี้ใช่ไหม?")) return;
   db.ref("orders/" + key).remove()
@@ -188,6 +196,10 @@ function updateChart(orders) {
       }
     });
   }
+}
+
+function playNotificationSound() {
+  notificationSound.play();
 }
 
 filterDate.addEventListener("change", e => {
