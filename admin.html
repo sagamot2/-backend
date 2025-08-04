@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>หลังบ้านร้านส้มตำ</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div id="loginPage" class="login-container">
+    <h2>เข้าสู่ระบบแอดมิน</h2>
+    <div class="input-group">
+      <label for="username">ชื่อผู้ใช้</label>
+      <input type="text" id="username" placeholder="ชื่อผู้ใช้" />
+    </div>
+    <div class="input-group">
+      <label for="password">รหัสผ่าน</label>
+      <input type="password" id="password" placeholder="รหัสผ่าน" />
+    </div>
+    <button id="loginBtn">ล็อกอิน</button>
+    <p id="loginError" class="error-msg hidden"></p>
+  </div>
+
+  <div id="adminPage" class="hidden">
+    <button id="logoutBtn">ออกจากระบบ</button>
+    <h1>คำสังซื้อส้มตำ</h1>
+
+    <label for="filterDate">กรองวันที่:</label>
+
+    <input type="date" id="filterDate" />
+<div class="summary">
+  <p>จำนวนออเดอร์: <span id="orderCount">0</span> รายการ</p>
+</div>
+
+    <div id="orderList">กำลังโหลดคำสั่งซื้อ...</div>
+    <p>รายได้รวม: <span id="totalRevenue">0.00</span> บาท</p>
+
+    <canvas id="salesChart" width="800" height="300"></canvas>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
